@@ -1,30 +1,36 @@
-import { Component } from 'react';
+import {Component} from 'react';
 
 import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+    constructor() {
+        console.log("Constructor");
+        super();
 
-  render() {
-    return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-    );
-  }
+        this.state = {
+            monsters: []
+        };
+    }
+
+    componentDidMount() {
+        console.log("componentDidMount");
+        fetch('https://jsonplaceholder.typicode.com/users').then(response => response.json())
+            .then(users => this.setState(() => ({monsters: users}), () => console.log("Successful state set.")));
+    }
+
+    render() {
+        console.log("render")
+        return (
+            <div className="App">
+                {
+                    this.state.monsters.map((monster) => {
+                        return <div key={monster.id}><h1>{monster.name}</h1></div>
+                    })
+                }
+            </div>
+        );
+    }
 }
 
 export default App;
