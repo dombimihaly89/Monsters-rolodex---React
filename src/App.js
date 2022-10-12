@@ -2,6 +2,8 @@ import {Component} from 'react';
 
 import logo from './logo.svg';
 import './App.css';
+import CardList from "./components/card-list/card-list.component";
+import SearchBox from "./components/search-box/search-box.component";
 
 class App extends Component {
     constructor() {
@@ -9,8 +11,17 @@ class App extends Component {
         super();
 
         this.state = {
-            monsters: []
+            monsters: [],
+            searchValue: ""
         };
+    }
+
+    onNameFilter = (monsterName) => {
+        return monsterName.toLowerCase().includes(this.state.searchValue);
+    }
+
+    onSearchChange = (event) => {
+        this.setState(() => ({searchValue: event.target.value.toLowerCase()}));
     }
 
     componentDidMount() {
@@ -21,13 +32,17 @@ class App extends Component {
 
     render() {
         console.log("render")
+        const { monsters, searchValue} = this.state
+        const { onNameFilter, onSearchChange, state } = this
+
+        const filteredMonsters = monsters.filter((monster) => onNameFilter(monster.name))
+
         return (
             <div className="App">
-                {
-                    this.state.monsters.map((monster) => {
-                        return <div key={monster.id}><h1>{monster.name}</h1></div>
-                    })
-                }
+                <h1 className="app-title">Monsters Rolodex</h1>
+
+                <SearchBox className="search-box" onChangeHandler={onSearchChange} placeholder="search monsters" />
+                <CardList monsters={filteredMonsters} />
             </div>
         );
     }
