@@ -1,51 +1,43 @@
-import {Component} from 'react';
-
-import logo from './logo.svg';
 import './App.css';
 import CardList from "./components/card-list/card-list.component";
 import SearchBox from "./components/search-box/search-box.component";
+import {useEffect, useState} from "react";
 
-class App extends Component {
-    constructor() {
-        console.log("Constructor");
-        super();
+const App = () => {
 
-        this.state = {
-            monsters: [],
-            searchValue: ""
-        };
-    }
+    // useState gives back an array with 2 values: [value, setValue]
+    // what we do here is array destructuring which means that I would like to get the values from the array
+    // This values can be used then separately. useState is a hook btw.
+    // Important: rerender happens when searchField's value changes and not when setSearchField function get called.
+    const [searchField, setSearchField] = useState('');
+    const [monsters, setMonsters] = useState([]);
+    const [filteredMonsters, setFilteredMonsters] = useState(monsters)
 
-    onNameFilter = (monsterName) => {
-        return monsterName.toLowerCase().includes(this.state.searchValue);
-    }
-
-    onSearchChange = (event) => {
-        this.setState(() => ({searchValue: event.target.value.toLowerCase()}));
-    }
-
-    componentDidMount() {
-        console.log("componentDidMount");
+    useEffect(() => {
         fetch('https://jsonplaceholder.typicode.com/users').then(response => response.json())
-            .then(users => this.setState(() => ({monsters: users}), () => console.log("Successful state set.")));
+            .then(users => setMonsters(users));
+    }, [])
+
+    useEffect(() => {
+        setFilteredMonsters(monsters.filter((monster) => onNameFilter(monster.name)))
+    }, [searchField, monsters])
+
+    const onSearchChange = (event) => {
+        const lowerCasedSearchFieldString = event.target.value.toLowerCase();
+        setSearchField(lowerCasedSearchFieldString);
     }
 
-    render() {
-        console.log("render")
-        const { monsters, searchValue} = this.state
-        const { onNameFilter, onSearchChange, state } = this
-
-        const filteredMonsters = monsters.filter((monster) => onNameFilter(monster.name))
-
-        return (
-            <div className="App">
-                <h1 className="app-title">Monsters Rolodex</h1>
-
-                <SearchBox className="search-box" onChangeHandler={onSearchChange} placeholder="search monsters" />
-                <CardList monsters={filteredMonsters} />
-            </div>
-        );
+    const onNameFilter = (monsterName) => {
+        return monsterName.toLowerCase().includes(searchField);
     }
+
+    return (
+        <div className="App">
+            <h1 className="app-title">Monsters Rolodex</h1>
+            <SearchBox className="search-box" onChangeHandler={onSearchChange} placeholder="search monsters"/>
+            <CardList monsters={filteredMonsters}/>
+        </div>
+    )
 }
 
 export default App;
